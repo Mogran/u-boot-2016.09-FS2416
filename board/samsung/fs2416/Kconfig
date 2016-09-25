@@ -1,0 +1,15 @@
+if TARGET_FS2416
+
+config SYS_BOARD
+	default "fs2416"
+
+config SYS_VENDOR
+	default "samsung"
+
+config SYS_SOC
+	default "s3c2416"
+
+config SYS_CONFIG_NAME
+	default "fs2416"
+
+endif

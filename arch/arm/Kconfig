@@ -134,12 +134,16 @@ config TARGET_SMDK2410
 	bool "Support smdk2410"
 	select CPU_ARM920T
 
+config TARGET_FS2416
+	bool "Support fs2416"
+	select CPU_ARM926EJS
 
 endchoice
 
 source "arch/arm/cpu/armv7/Kconfig"
 
 source "board/samsung/smdk2410/Kconfig"
+source "board/samsung/fs2416/Kconfig"
 
 source "arch/arm/Kconfig.debug"
 

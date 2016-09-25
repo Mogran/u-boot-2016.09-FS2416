@@ -1,0 +1,6 @@
+FS2416 BOARD
+M:	lumingliang <lumingliang.github@gmail.com>
+S:	Maintained
+F:	board/samsung/fs2416
+F:	include/configs/fs2416.h
+F:	configs/fs2416_defconfig
