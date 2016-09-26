@@ -356,147 +356,81 @@ struct s3c24x0_i2s {
 
 /* I/O PORT (see manual chapter 9) */
 struct s3c24x0_gpio {
-#ifdef CONFIG_S3C2400
-	u32	pacon;
-	u32	padat;
+#if defined(CONFIG_S3C2416)
+	u32	gpacon;    /*0x56000000*/
+	u32	gpadat;    
+	u32	res1;      
+	u32	res2;      
+	u32	gpbcon;    /*0x56000010*/
+	u32	gpbdat;    
+	u32	gpbup;     
+	u32 gpbsel;    
+	u32	gpccon;    /*0x56000020*/
+	u32	gpcdat;    
+	u32	gpcup;     
+	u32	res3;	   
+	u32	gpdcon;    /*0x56000030*/
+	u32	gpddat;   
+	u32	gpdup;     
+	u32	res4;      
+	u32	gpecon;    /*0x56000040*/
+	u32	gpedat;   
+	u32	gpeup;     
+	u32	gpesel;    
+	u32	gpfcon;    /*0x56000050*/
+	u32	gpfdat;    
+	u32	gpfup;     
+	u32	res6;      
+	u32	gpgcon;    /*0x56000060*/
+	u32	gpgdat;    
+	u32	gpgup;    
+	u32	res7;     
+	u32	gphcon;    /*0x56000070*/
+	u32	gphdat;   
+	u32	gphup;    
+	u32	res8;      
 
-	u32	pbcon;
-	u32	pbdat;
-	u32	pbup;
-
-	u32	pccon;
-	u32	pcdat;
-	u32	pcup;
-
-	u32	pdcon;
-	u32	pddat;
-	u32	pdup;
-
-	u32	pecon;
-	u32	pedat;
-	u32	peup;
-
-	u32	pfcon;
-	u32	pfdat;
-	u32	pfup;
-
-	u32	pgcon;
-	u32	pgdat;
-	u32	pgup;
-
-	u32	opencr;
-
-	u32	misccr;
-	u32	extint;
-#endif
-#ifdef CONFIG_S3C2410
-	u32	gpacon;
-	u32	gpadat;
-	u32	res1[2];
-	u32	gpbcon;
-	u32	gpbdat;
-	u32	gpbup;
-	u32	res2;
-	u32	gpccon;
-	u32	gpcdat;
-	u32	gpcup;
-	u32	res3;
-	u32	gpdcon;
-	u32	gpddat;
-	u32	gpdup;
-	u32	res4;
-	u32	gpecon;
-	u32	gpedat;
-	u32	gpeup;
-	u32	res5;
-	u32	gpfcon;
-	u32	gpfdat;
-	u32	gpfup;
-	u32	res6;
-	u32	gpgcon;
-	u32	gpgdat;
-	u32	gpgup;
-	u32	res7;
-	u32	gphcon;
-	u32	gphdat;
-	u32	gphup;
-	u32	res8;
-
-	u32	misccr;
-	u32	dclkcon;
-	u32	extint0;
-	u32	extint1;
-	u32	extint2;
+	u32	misccr;    /*0x56000080*/
+	u32	dclkcon;   
+	u32	extint0;   
+	u32	extint1;   
+	u32	extint2;   /*0x56000090*/
 	u32	eintflt0;
 	u32	eintflt1;
-	u32	eintflt2;
-	u32	eintflt3;
-	u32	eintmask;
-	u32	eintpend;
-	u32	gstatus0;
-	u32	gstatus1;
-	u32	gstatus2;
-	u32	gstatus3;
-	u32	gstatus4;
-#endif
-#if defined(CONFIG_S3C2440)
-	u32	gpacon;
-	u32	gpadat;
-	u32	res1[2];
-	u32	gpbcon;
-	u32	gpbdat;
-	u32	gpbup;
-	u32	res2;
-	u32	gpccon;
-	u32	gpcdat;
-	u32	gpcup;
-	u32	res3;
-	u32	gpdcon;
-	u32	gpddat;
-	u32	gpdup;
-	u32	res4;
-	u32	gpecon;
-	u32	gpedat;
-	u32	gpeup;
-	u32	res5;
-	u32	gpfcon;
-	u32	gpfdat;
-	u32	gpfup;
-	u32	res6;
-	u32	gpgcon;
-	u32	gpgdat;
-	u32	gpgup;
-	u32	res7;
-	u32	gphcon;
-	u32	gphdat;
-	u32	gphup;
-	u32	res8;
-
-	u32	misccr;
-	u32	dclkcon;
-	u32	extint0;
-	u32	extint1;
-	u32	extint2;
-	u32	eintflt0;
-	u32	eintflt1;
-	u32	eintflt2;
-	u32	eintflt3;
-	u32	eintmask;
-	u32	eintpend;
-	u32	gstatus0;
-	u32	gstatus1;
-	u32	gstatus2;
+	u32	eintflt2;  
+	u32	eintflt3;  /*0x560000a0*/
+	u32	eintmask;  
+	u32	eintpend; 
+	u32	gstatus0;  
+	u32	gstatus1;  /*0x560000b0*/
+	u32	gstatus2;  
 	u32	gstatus3;
 	u32	gstatus4;
 
-	u32	res9;
-	u32	dsc0;
-	u32	dsc1;
-	u32	mslcon;
-	u32	gpjcon;
-	u32	gpjdat;
-	u32	gpjup;
-	u32	res10;
+	u32	dsc0;      /*0x560000c0*/
+	u32	dsc1;     
+	u32 dsc2;     
+	u32	mslcon;    
+	u32	gpjcon;    /*0x560000d0*/
+	u32	gpjdat;     
+	u32	gpjup;     
+	u32	gpjsel;    
+	u32 gpkcon;    /*0x560000e0*/
+	u32 gpkdat;    
+	u32 gpkudp;
+	u32 res9;
+	u32 gplcon;    /*0x560000f0*/
+	u32 gpldat;
+	u32 gpludp;
+	u32 gplsel;
+	u32 gpmcon;    /*0x56000100*/
+	u32 gpmdat;
+	u32 gpmudp;
+	u32 res10;
+	
+	u32 dsc3;	  /*0x56000110*/	
+	u32 pddmcon;  /*0x56000114*/
+	u32 pdsmcon;  /*0x56000118*/
 #endif
 };
 

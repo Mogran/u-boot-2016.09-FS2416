@@ -181,4 +181,8 @@
 
 #define CONFIG_BOARD_EARLY_INIT_F
 
+/*
+ * SPL */
+#define CONFIG_SPL_FRAMEWORK 
+
 #endif /* __CONFIG_H */

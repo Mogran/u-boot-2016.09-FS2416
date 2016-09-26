@@ -39,6 +39,7 @@ gd_t gdata __attribute__ ((section(".data")));
  */
 void __weak board_init_f(ulong dummy)
 {
+
 }
 
 /*

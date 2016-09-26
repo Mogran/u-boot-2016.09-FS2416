@@ -25,7 +25,7 @@
 
 #define CONFIG_SYS_ARM_CACHE_WRITETHROUGH
 
-/* input clock of PLL (the SMDK2410 has 12MHz input clock) */
+/* input clock of PLL (the FS2416 has 12MHz input clock) */
 #define CONFIG_SYS_CLK_FREQ	12000000
 
 #define CONFIG_CMDLINE_TAG	/* enable passing of ATAGs */
@@ -180,5 +180,20 @@
 				GENERATED_GBL_DATA_SIZE)
 
 #define CONFIG_BOARD_EARLY_INIT_F
+
+
+/* SPL relatived */
+#define CONFIG_SKIP_LOWLEVEL_INIT
+#if 0
+#define CONFIG_SPL_FRAMEWORK 
+#define CONFIG_SPL_LDSCRIPT  "$(CPUDIR)/arm926ejs/s3c2416/u-boot-spl.lds"
+#define CONFIG_SPL_TEXT_BASE        0x0
+#define CONFIG_SPL_NAND_SUPPORT 
+#define CONFIG_SPL_NAND_LOAD
+#define CONFIG_SYS_NAND_U_BOOT_OFFS  0x2000
+#define CONFIG_SYS_NAND_U_BOOT_SIZE  0x2000
+#define CONFIG_SYS_NAND_U_BOOT_DST   PHYS_SDRAM_1 + 0x1000
+#define CONFIG_SYS_NAND_U_BOOT_START CONFIG_SYS_NAND_U_BOOT_DST 
+#endif
 
 #endif /* __CONFIG_H */

@@ -90,7 +90,10 @@ ENTRY(_main)
 	bl	board_init_f_init_reserve
 
 	mov	r0, #0
+
+#if ! defined(CONFIG_SPL_BUILD) /* add by <mingliang.lu> */
 	bl	board_init_f
+#endif
 
 #if ! defined(CONFIG_SPL_BUILD)
 

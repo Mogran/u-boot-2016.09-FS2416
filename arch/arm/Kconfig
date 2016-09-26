@@ -133,10 +133,13 @@ choice
 config TARGET_SMDK2410
 	bool "Support smdk2410"
 	select CPU_ARM920T
+	select SUPPORT_SPL
 
 config TARGET_FS2416
 	bool "Support fs2416"
 	select CPU_ARM926EJS
+	select SUPPORT_SPL
+	select SPL
 
 endchoice
 
