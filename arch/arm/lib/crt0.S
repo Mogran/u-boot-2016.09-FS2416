@@ -91,8 +91,38 @@ ENTRY(_main)
 
 	mov	r0, #0
 
-#if ! defined(CONFIG_SPL_BUILD) /* add by <mingliang.lu> */
+#if defined(CONFIG_SPL_BUILD) /* add by <mingliang.lu> */
+
+	ldr r0, =CONFIG_SYS_NAND_U_BOOT_START	
+	ldr r1, =CONFIG_SYS_TEXT_BASE	
+	ldr r2, =CONFIG_SYS_NAND_U_BOOT_SIZE
+
+#	bl copy_u_boot_to_sdram
+
+	tst r0, #0
+	bne infinite_loop
+
+	ldr pc, =CONFIG_SYS_TEXT_BASE
+
+infinite_loop:
+#define GPBCON 0x56000010
+#define GPBDAT 0x56000014
+#define GPBUDP 0x56000018
+
+	ldr r1, =GPBCON
+	ldr r2, [r1]
+	bic r2, r2, #(1 << 3)|(1 << 9)	
+
+	ldr r1, =GPBDAT
+	ldr r2, [r1]
+	bic r2, r2, #(1 << 3)|(1 << 9)	
+
+0: 	
+	b 0b
+#else	
+
 	bl	board_init_f
+
 #endif
 
 #if ! defined(CONFIG_SPL_BUILD)

@@ -23,14 +23,13 @@ int print_cpuinfo(void)
 {
 	int i;
 	char buf[32];
-/* the S3C2400 seems to be lacking a CHIP ID register */
-#ifndef CONFIG_S3C2400
+#if 0	
 	ulong cpuid;
 	struct s3c24x0_gpio * const gpio = s3c24x0_get_base_gpio();
 
 	cpuid = readl(&gpio->gstatus1);
 	printf("CPUID: %8lX\n", cpuid);
-#endif
+#endif	
 	for (i = 0; i < ARRAY_SIZE(freq_f); i++)
 		printf("%cCLK: %8s MHz\n", freq_c[i], strmhz(buf, freq_f[i]()));
 

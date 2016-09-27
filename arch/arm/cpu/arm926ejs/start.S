@@ -43,13 +43,11 @@ reset:
 	orr	r0,r0,#0xd3
 	msr	cpsr,r0
 
-	/*
-	 * we do sys-critical inits only at reboot,
-	 * not when booting from ram!
-	 */
+#if defined(CONFIG_SL_BUILD)	
 #ifndef CONFIG_SKIP_LOWLEVEL_INIT
 	bl	cpu_init_crit
 #endif
+#endif 
 
 	bl	_main
 

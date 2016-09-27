@@ -24,14 +24,16 @@
  *
  */
 
-#define BWSCON	0x48000000
+#define BWSCON			0x48000000
 
 /* BWSCON */
-#define DW8			(0x0)
+#define DW8				(0x0)
 #define DW16			(0x1)
 #define DW32			(0x2)
 #define WAIT			(0x1<<2)
 #define UBLB			(0x1<<3)
+#define DDR2            (0x1)
+
 
 #define B1_BWSCON		(DW32)
 #define B2_BWSCON		(DW16)
@@ -102,14 +104,78 @@
 /* REFRESH parameter */
 #define REFEN			0x1	/* Refresh enable */
 #define TREFMD			0x0	/* CBR(CAS before RAS)/Auto refresh */
-#define Trp			0x0	/* 2clk */
-#define Trc			0x3	/* 7clk */
+#define Trp				0x0	/* 2clk */
+#define Trc				0x3	/* 7clk */
 #define Tchr			0x2	/* 3clk */
 #define REFCNT			1113	/* period=15.6us, HCLK=60Mhz, (2048+1-15.6*60) */
-/**************************************/
+
+#define WDTCON   0x53000000
+#define INTMSK1  0x4A000008
+#define INTMSK2  0x4A000048
+#define LOCKCON0 0x4C000000
+#define LOCKCON1 0x4C000004
+#define MPLLCON  0x4C000010
+#define EPLLCON  0x4C000018
+#define CLKSRC   0x4C000020
+#define CLKDIV0  0x4C000024
+#define CLKDIV1  0x4C000028
+#define CLKDIV2  0x4C00002C
+#define HCLKCON  0x4C000030
+#define PCLKCON  0x4C000034 
 
 .globl lowlevel_init
 lowlevel_init:
+
+	/* watchdog and inturrupt and clock setup */
+	ldr r0, =WDTCON
+	mov r1, #0
+	str r1, [r0]
+
+	ldr r0, =INTMSK1
+	ldr r1, =0xffffffff
+	str r1, [r0]
+
+	ldr r0, =INTMSK2
+	ldr r1, =0xffffffff 
+	str r1, [r0]
+
+	ldr r0, =CLKDIV0
+	ldr r1, =0x0000022d
+	str r1, [r0]
+
+	ldr r0, =HCLKCON
+	ldr r1, =0xffffffff
+	str r1, [r0]
+
+	ldr r0, =PCLKCON
+	ldr r1, =0xffffffff
+	str r1, [r0]
+
+	ldr r0, =MPLLCON
+	ldr r1, =(0 << 24)+(400 << 14)+(3 << 5)+(1 << 0)
+	str r1, [r0]
+
+	ldr r0, =EPLLCON
+	ldr r1, =(0 << 24)+(32 << 16)+(1 << 8)+(2 << 0)
+	str r1, [r0]
+
+	ldr r0, =LOCKCON0
+	ldr r1, =3600
+	str r1, [r0]
+
+	ldr r0, =LOCKCON1
+	ldr r1, =3600
+	str r1, [r0]
+
+	ldr r0, =CLKSRC
+	ldr r1, =(1 << 6)+(1 << 4)
+	str r1, [r0]
+
+#wait until clock stablize all clock.
+	mov r2, #0x10000
+1:  subs r2, r2, #1
+	bne 1b
+
 	/* memory control configuration */
 	/* make r0 relative the current location so that it */
 	/* reads SMRDATA out of FLASH rather than memory ! */
@@ -131,7 +197,7 @@ lowlevel_init:
 /* the literal pools origin */
 
 SMRDATA:
-    .word (0+(B1_BWSCON<<4)+(B2_BWSCON<<8)+(B3_BWSCON<<12)+(B4_BWSCON<<16)+(B5_BWSCON<<20)+(B6_BWSCON<<24)+(B7_BWSCON<<28))
+    .word ((DW16 << 0)+ (DDR2 << 1) + (B1_BWSCON<<4)+(B2_BWSCON<<8)+(B3_BWSCON<<12)+(B4_BWSCON<<16)+(B5_BWSCON<<20)+(B6_BWSCON<<24)+(B7_BWSCON<<28))
     .word ((B0_Tacs<<13)+(B0_Tcos<<11)+(B0_Tacc<<8)+(B0_Tcoh<<6)+(B0_Tah<<4)+(B0_Tacp<<2)+(B0_PMC))
     .word ((B1_Tacs<<13)+(B1_Tcos<<11)+(B1_Tacc<<8)+(B1_Tcoh<<6)+(B1_Tah<<4)+(B1_Tacp<<2)+(B1_PMC))
     .word ((B2_Tacs<<13)+(B2_Tcos<<11)+(B2_Tacc<<8)+(B2_Tcoh<<6)+(B2_Tah<<4)+(B2_Tacp<<2)+(B2_PMC))
