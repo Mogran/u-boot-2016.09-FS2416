@@ -13,12 +13,12 @@ u-boot-2016.09 to u-boot-2016.09-FS2416
 
 # How to use this?
 
-- 1. compiler source code
+- Compiler source code
 	- make distclean 
 	- make fs2416_defconfig
 	- make
 
-- 2. ISP (In System Program)
+- ISP (In System Program)
 	- use H-JTAG to write u-boot-spl.bin to the first 8Kb of Nandflash
 	- use H-JTAG to write u-boot.bin to addr at the begin of 8KB of Nandflash.
 
