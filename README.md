@@ -13,7 +13,7 @@ u-boot-2016.09 to u-boot-2016.09-FS2416
 
 # How to use this?
 
-- Compiler source code
+- Compile source code
 	- make distclean 
 	- make fs2416_defconfig
 	- make
