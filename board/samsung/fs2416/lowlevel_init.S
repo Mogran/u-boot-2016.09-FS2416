@@ -66,13 +66,12 @@ lowlevel_init:
 	ldr r1, =(1 << 6)+(1 << 4)
 	str r1, [r0]
 
-#wait until clock stablize all clock.
-	mov r2, #0x10000
+	mov r2, #0x10000 @wait until clock stablize all clock.
 1:  subs r2, r2, #1
 	bne 1b
 
 #	DDR2 initialization
-	ldr r0, =BANKCFG
+	ldr r0, =BANKCFG @BANKCFG
 	ldr r1, =(2<<17)+(2<<14)+(2<<11)+(2<<8)+(1<<1)+(1<<0)
 	str r1, [r0, #0x0]
 
@@ -88,6 +87,7 @@ lowlevel_init:
 	ldr r1, [r0, #0x4]
 	bic r1, r1, #0x3
 	orr r1, r1, #0x1
+	str r1, [r0, #0x4]
 
 #  issue a CMD to EMR(2)	
 	ldr r1, =(2<<30)+(0<<23)+(0<<19)+(0<<16)
@@ -115,7 +115,6 @@ lowlevel_init:
 	str r1, [r0, #0x0c]
 
 	ldr r1, [r0, #0x4]
-	bic r1, r1, #0x3
 	orr r1, r1, #0x3
 	str r1, [r0, #0x4]
 
@@ -162,7 +161,7 @@ lowlevel_init:
 1:  subs r2, r2, #1
 	bne 1b
 
-#  excute OCD 
+#  excute OCD Calibration
 	ldr r1, =0xffff0000 
 	ldr r2, [r0, #0x0c]
 	bic r2, r2, r1
