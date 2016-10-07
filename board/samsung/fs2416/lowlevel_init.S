@@ -1,6 +1,9 @@
 /*
  * FS2416 memory configuration
- *
+ * 
+ * 0.配置系统时钟，使能各模块单元时钟，为初始化ddr2内存做准备
+ * 1.初始化ddr2内存，初始化nandflash
+ * 2.为接下来的拷贝u-boot到内存中做准备
  */
 #include <config.h>
 
@@ -183,6 +186,10 @@ lowlevel_init:
 	ldr r1, [r0, #0x4]
 	bic r1, r1, #0x3
 	str r1, [r0, #0x4]
+
+
+#  
+
 
 	/* everything is fine now */
 	mov	pc, lr
