@@ -21,6 +21,8 @@
 #define HCLKCON  0x4C000030
 #define PCLKCON  0x4C000034 
 #define BANKCFG	 0x48000000
+#define NFCONF   0x4E000000
+#define NFCONT   0x4E000004
 
 .globl lowlevel_init
 
@@ -188,8 +190,20 @@ lowlevel_init:
 	str r1, [r0, #0x4]
 
 
-#  
+#  init Nand Controller
+	ldr r0, =NFCONF
+	ldr r1, [r0]
+	bic r1, r1, #0xffffffff
+	ldr r2, =(0 << 12)|(2 << 8)|(1 << 4)|(1 << 1)
+	orr r1, r1, r2
+	str r1, [r0]
 
+	ldr r0, =NFCONT
+	ldr r1, [r0]
+	bic r1, r1, #0xffffffff
+	ldr r2, =(2 << 12)|(1 << 1)|(1 << 0)
+	orr r1, r1, r2
+	str r1, [r0]
 
 	/* everything is fine now */
 	mov	pc, lr
