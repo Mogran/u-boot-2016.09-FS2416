@@ -80,7 +80,11 @@ static int nand_read_one_page(int addr, unsigned char *dat)
 	return 0;	
 }
 
-
+/*
+ * @func        : copy_u_boot_to_sdram
+ * @description : 用来拷贝u-boot到内存中去运行
+ *
+ * */
 int copu_u_boot_to_sdram(int nand_addr, int dram_addr, int u_boot_size)
 {
 	int ofs = 0;
@@ -89,3 +93,4 @@ int copu_u_boot_to_sdram(int nand_addr, int dram_addr, int u_boot_size)
 
 	return 0;
 }
+
