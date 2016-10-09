@@ -8,3 +8,5 @@
 
 obj-y	:= fs2416.o
 obj-y	+= lowlevel_init.o
+
+obj-$(CONFIG_SPL_BUILD) += nand_boot.o

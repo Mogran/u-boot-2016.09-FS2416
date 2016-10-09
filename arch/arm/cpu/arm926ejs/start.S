@@ -43,7 +43,7 @@ reset:
 	orr	r0,r0,#0xd3
 	msr	cpsr,r0
 
-#if defined(CONFIG_SL_BUILD)	
+#if defined(CONFIG_SPL_BUILD)	
 #ifndef CONFIG_SKIP_LOWLEVEL_INIT
 	bl	cpu_init_crit
 #endif

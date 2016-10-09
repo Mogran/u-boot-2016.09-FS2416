@@ -208,19 +208,19 @@ config CMD_RUN
 
 config CMD_IMI
 	bool "iminfo"
-	default y
+	default n
 	help
 	  Print header information for application image.
 
 config CMD_IMLS
 	bool "imls"
-	default y
+	default n
 	help
 	  List all images found in flash
 
 config CMD_XIMG
 	bool "imxtract"
-	default y
+	default n
 	help
 	  Extract a part of a multi-image.
 
@@ -359,7 +359,7 @@ config CMD_LOADS
 
 config CMD_FLASH
 	bool "flinfo, erase, protect"
-	default y
+	default n
 	help
 	  NOR flash support.
 	    flinfo - print FLASH memory information

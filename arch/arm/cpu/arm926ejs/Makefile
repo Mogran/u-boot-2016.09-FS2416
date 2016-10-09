@@ -8,12 +8,6 @@
 extra-y	= start.o
 obj-y	= cpu.o cache.o
 
-ifdef	CONFIG_SPL_BUILD
-ifdef	CONFIG_SPL_NO_CPU_SUPPORT_CODE
-extra-y	:=
-endif
-endif
-
 obj-$(CONFIG_ARMADA100) += armada100/
 obj-$(CONFIG_S3C2416) += s3c2416/
 obj-$(if $(filter lpc32xx,$(SOC)),y) += lpc32xx/

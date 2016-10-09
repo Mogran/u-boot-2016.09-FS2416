@@ -97,7 +97,7 @@ ENTRY(_main)
 	ldr r1, =CONFIG_SYS_TEXT_BASE	
 	ldr r2, =CONFIG_SYS_NAND_U_BOOT_SIZE
 
-#	bl copy_u_boot_to_sdram
+	bl copy_u_boot_to_dram
 
 	tst r0, #0
 	bne infinite_loop

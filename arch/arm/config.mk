@@ -73,6 +73,7 @@ PF_CPPFLAGS_ABI := $(call cc-option,\
 				)\
 			)\
 		)
+
 PLATFORM_CPPFLAGS += $(PF_CPPFLAGS_ARM) $(PF_CPPFLAGS_ABI)
 
 # For EABI, make sure to provide raise()
