@@ -1,1 +1,0 @@
-cmd_arch/arm/cpu/arm926ejs/s3c2416/built-in.o :=  arm-none-linux-gnueabi-ld     -r -o arch/arm/cpu/arm926ejs/s3c2416/built-in.o arch/arm/cpu/arm926ejs/s3c2416/cpu_info.o arch/arm/cpu/arm926ejs/s3c2416/speed.o arch/arm/cpu/arm926ejs/s3c2416/timer.o 

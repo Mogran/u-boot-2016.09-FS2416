@@ -1,1 +1,0 @@
-cmd_spl/board/samsung/fs2416/built-in.o :=  arm-none-linux-gnueabi-ld     -r -o spl/board/samsung/fs2416/built-in.o spl/board/samsung/fs2416/fs2416.o spl/board/samsung/fs2416/lowlevel_init.o spl/board/samsung/fs2416/nand_boot.o 

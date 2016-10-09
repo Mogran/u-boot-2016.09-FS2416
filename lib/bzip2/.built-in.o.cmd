@@ -1,1 +1,0 @@
-cmd_lib/bzip2/built-in.o :=  arm-none-linux-gnueabi-ld     -r -o lib/bzip2/built-in.o lib/bzip2/bzlib.o lib/bzip2/bzlib_crctable.o lib/bzip2/bzlib_decompress.o lib/bzip2/bzlib_randtable.o lib/bzip2/bzlib_huffman.o 
