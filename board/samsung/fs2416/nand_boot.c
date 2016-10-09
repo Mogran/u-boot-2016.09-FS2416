@@ -56,7 +56,7 @@ void nand_write_addr(unsigned char addr)
 	NFADDR = addr;
 }
 
-unsigned char nand_read_byte(void)
+unsigned char nand_read_one_byte(void)
 {
 	return NFDATA&0xff;
 }
@@ -79,11 +79,6 @@ void nand_clear_Rnb(void)
 void nand_wait_Rnb_ready(void)
 {
 	while(!(NFSTAT & (1 << 4)));
-}
-
-unsigned char nand_read_one_byte(void)
-{
-	return 0;
 }
 
 void nand_reset(void)
@@ -131,11 +126,20 @@ static int nand_read_one_page(int addr, unsigned char *dat)
  * @func        : copy_u_boot_to_sdram
  * @description : 用来拷贝u-boot到内存中去运行
  *
+ *				1.传入的u-boot存放的地址要是nandflash的页边界对齐
+ *				2.传入的u-boot的实际大小也要求是nandflash的页边界对齐
  * */
 int copy_u_boot_to_dram(int uboot_start_addr, int dram_addr, int uboot_size)
 {
 	int ofs = 0;
 	
+	if(uboot_start_addr%PAGE_SIZE || uboot_size%PAGE_SIZE){
+		/* fix me? if PAGE_SIZE != 2048 */
+		return 1;
+	}
+
+	nand_reset();
+
 	for(ofs = uboot_start_addr; ofs < uboot_start_addr + uboot_size; ofs += PAGE_SIZE){
 		nand_read_one_page(ofs, (unsigned char*)dram_addr);
 		dram_addr += PAGE_SIZE;
