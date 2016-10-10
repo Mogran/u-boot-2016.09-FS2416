@@ -20,9 +20,17 @@
 #define CLKDIV2  0x4C00002C
 #define HCLKCON  0x4C000030
 #define PCLKCON  0x4C000034 
-#define BANKCFG	 0x48000000
 #define NFCONF   0x4E000000
 #define NFCONT   0x4E000004
+#define GPBCON   0x56000010
+#define GPBDAT   0x56000014
+#define GPBUDP   0x56000018
+
+#define BANKCFG0REG	0x48000000 
+#define BANKCON1REG	0x48000004 
+#define BANKCON2REG	0x48000008 
+#define BANKCON3REG	0x4800000C 
+#define REFRESHREG  0x48000010
 
 .globl lowlevel_init
 
@@ -76,133 +84,162 @@ lowlevel_init:
 	bne 1b
 
 #	DDR2 initialization
-	ldr r0, =BANKCFG @BANKCFG
+
+	ldr r0, =BANKCFG0REG @BANKCFG
 	ldr r1, =(2<<17)+(2<<14)+(2<<11)+(2<<8)+(1<<1)+(1<<0)
-	str r1, [r0, #0x0]
-
-#   BANKCON1
-	ldr r1, =(3<<28)+(1<<26)+(1<<8)+(0<<7)+(1<<6)+(0<<5)+(1<<4)
-	str r1, [r0, #0x4]
-
-#  BANKCON2
-	ldr r1, =(6<<20)+(14<<16)+(2<<4)+(2<<2)+(2<<0)
-	str r1, [r0, #0x8]
-
-#  issue a PALL CMD to DRAMC
-	ldr r1, [r0, #0x4]
-	bic r1, r1, #0x3
-	orr r1, r1, #0x1
-	str r1, [r0, #0x4]
-
-#  issue a CMD to EMR(2)	
-	ldr r1, =(2<<30)+(0<<23)+(0<<19)+(0<<16)
-	str r1, [r0, #0x0c]
-
-	ldr r1, [r0, #0x4]
-	orr r1, r1, #0x3
-	str r1, [r0, #0x4]
-
-#  issue a cmd EMR(3)
-	ldr r1, =(3<<30)
-	str r1, [r0, #0x0c]
-
-	ldr r1, [r0, #0x4]
-	orr r1, r1, #0x3
-	str r1, [r0, #0x4]
-
-#  enable DLL, RDQS, nDQS, ODT disable
-	ldr r1, =0xffff0000 
-	ldr r2, [r0, #0x0c]
-	bic r2, r2, r1
-	
-	ldr r1,=(1<<30)+(0<<28)+(0<<27)+(1<<26)+(7<<23)+(0<<19)+(0<<18)+(0<<17)+(0<<16)
-	orr r1, r1, r2	
-	str r1, [r0, #0x0c]
-
-	ldr r1, [r0, #0x4]
-	orr r1, r1, #0x3
-	str r1, [r0, #0x4]
-
-#  issue a mode set command to Mode register for DLL reset 
-	ldr r1, =0x0000ffff 
-	ldr r2, [r0, #0x0c]
-	bic r2, r2, r1
-	
-	ldr r1,=(1<<9)+(1<<8)+(0<<7)+(3<<4)
-	orr r1, r1, r2	
-	str r1, [r0, #0x0c]
-
-	ldr r1, [r0, #0x4]
-	bic r1, r1, #0x3
-	orr r1, r1, #0x2
-	str r1, [r0, #0x4]
-
-#  issue a PLL command
-	ldr r1, [r0, #0x4]
-	bic r1, r1, #0x3
-	orr r1, r1, #0x1
-	str r1, [r0, #0x4]
-
-#  issue a refresh cmd 
-	ldr r1, =0x20
-	str r1, [r0, #0x10]
-
-#  issue a MRS command  
-	ldr r1, =0x0000ffff 
-	ldr r2, [r0, #0x0c]
-	bic r2, r2, r1
-	
-	ldr r1,=(1<<9)+(0<<8)+(0<<7)+(3<<4)
-	orr r1, r1, r2	
-	str r1, [r0, #0x0c]
-
-	ldr r1, [r0, #0x4]
-	bic r1, r1, #0x3
-	orr r1, r1, #0x2
-	str r1, [r0, #0x4]
-
-#wait 200 clock period.
-	mov r2, #200
-1:  subs r2, r2, #1
-	bne 1b
-
-#  excute OCD Calibration
-	ldr r1, =0xffff0000 
-	ldr r2, [r0, #0x0c]
-	bic r2, r2, r1
-	
-	ldr r1,=(1<<30)+(0<<28)+(0<<27)+(1<<26)+(0<<23)+(0<<19)+(0<<18)+(0<<17)+(0<<16)
-	orr r1, r1, r2	
-	str r1, [r0, #0x0c]
-
-	ldr r1, [r0, #0x4]
-	orr r1, r1, #0x3
-	str r1, [r0, #0x4]
-
-
-#  set refresh cycle ,K4T51163QJ-BCE7's tREFI=7.8us (0~85 degree) 
-	ldr r1, =1038
-	str r1, [r0, #0x10]
-
-#  issue normal work command
-	ldr r1, [r0, #0x4]
-	bic r1, r1, #0x3
-	str r1, [r0, #0x4]
-
-
-#  init Nand Controller
-	ldr r0, =NFCONF
-	ldr r1, [r0]
-	bic r1, r1, #0xffffffff
-	ldr r2, =(0 << 12)|(2 << 8)|(1 << 4)|(1 << 1)
-	orr r1, r1, r2
 	str r1, [r0]
 
-	ldr r0, =NFCONT
+	ldr r0, =BANKCON1REG
+	ldr r1, =(3<<28)+(1<<26)+(1<<8)+(0<<7)+(1<<6)+(0<<5)+(1<<4)
+	str r1, [r0]
+
+	ldr r0, =BANKCON2REG
+	ldr r1, =(6<<20)+(14<<16)+(2<<4)+(2<<2)+(2<<0)
+	str r1, [r0]
+
+	ldr	r2, =BANKCON1REG
+	ldr	r1, [r2]
+	bic	r1, r1, #(0x3<<0)
+	orr	r1, r1, #(0x1<<0)
+	str	r1, [r2]
+
+	ldr	r2, =BANKCON3REG
+	ldr	r3, =0xFFFF0000
+	ldr	r1, [r2]
+	bic	r1, r1, r3
+	orr	r1, r1, #(BA_EMRS2<<30)
+	str	r1, [r2]
+
+	ldr	r2, =BANKCON1REG
+	ldr	r1, [r2]
+	bic	r1, r1, #(0x3<<0)
+	orr	r1, r1, #(0x3<<0)
+	str	r1, [r2]
+
+	ldr	r2, =BANKCON3REG
+	ldr	r3, =0xFFFF0000
+	ldr	r1, [r2]
+	bic	r1, r1, r3
+	orr	r1, r1, #(BA_EMRS3<<30)
+	str	r1, [r2]
+
+	ldr	r2, =BANKCON1REG
+	ldr	r1, [r2]
+	bic	r1, r1, #(0x3<<0)
+	orr	r1, r1, #(0x3<<0)
+	str	r1, [r2]
+
+	ldr	r2, =BANKCON3REG
+	ldr	r3, =0xFFFF0000
+	ldr	r4, =((BA_EMRS1<<30)+(RDQS_DIS<<27)+(nDQS_DIS<<26)+(OCD_MODE_EXIT<<23)+(DLL_EN<<16))
+
+	ldr	r1, [r2]
+	bic	r1, r1, r3
+	orr	r1, r1, r4
+	str	r1, [r2]
+
+	ldr	r2, =BANKCON1REG
+	ldr	r1, [r2]
+	bic	r1, r1, #(0x3<<0)
+	orr	r1, r1, #(0x3<<0)
+	str	r1, [r2]
+
+	ldr	r2, =BANKCON3REG
+	ldr	r3, =0xFFFF
+	ldr	r1, [r2]
+	bic	r1, r1, r3
+	orr	r1, r1, #((BA_MRS<<14)+(DLL_RESET_HIGH<<8)+(TM<<7)+(CL_MRS<<4))
+	str	r1, [r2]
+
+	ldr	r2, =BANKCON1REG
+	ldr	r1, [r2]
+	bic	r1, r1, #(0x3<<0)
+	orr	r1, r1, #(0x2<<0)
+	str	r1, [r2]
+
+	ldr	r2, =BANKCON1REG
+	ldr	r1, [r2]
+	bic	r1, r1, #(0x3<<0)
+	orr	r1, r1, #(0x1<<0)
+	str	r1, [r2]
+
+	ldr	r4, =REFRESHREG
+	ldr	r0, =0x20
+	str	r0, [r4]
+
+	ldr	r2, =BANKCON3REG
+	ldr	r3, =0xFFFF
+	ldr	r1, [r2]
+	bic	r1, r1, r3
+	orr	r1, r1, #((BA_MRS<<14)+(DLL_RESET_LOW<<8)+(TM<<7)+(CL_MRS<<4))
+	str	r1, [r2]
+
+	ldr	r2, =BANKCON1REG
+	ldr	r1, [r2]
+	bic	r1, r1, #(0x3<<0)
+	orr	r1, r1, #(0x2<<0)
+	str	r1, [r2]
+
+	mov	r0, #0x100
+2:
+	subs	r0, r0, #1
+	bne	2b
+
+	ldr	r2, =BANKCON3REG
+	ldr	r3, =0xFFFF0000
+	ldr	r4, =((BA_EMRS1<<30)+(RDQS_DIS<<27)+(nDQS_DIS<<26)+(OCD_MODE_DEFAULT<<23)+(DLL_EN<<16))
+	ldr	r1, [r2]
+	bic	r1, r1, r3
+	orr	r1, r1, r4	@((BA_EMRS1<<30)+(RDQS_DIS<<27)+(nDQS_DIS<<26)+(OCD_MODE_DEFAULT<<23)+(DLL_EN<<16))
+	str	r1, [r2]
+
+	ldr	r2, =BANKCON1REG
+	ldr	r1, [r2]
+	bic	r1, r1, #(0x3<<0)
+	orr	r1, r1, #(0x3<<0)
+	str	r1, [r2]
+
+	ldr	r2, =BANKCON3REG
+	ldr	r3, =0xFFFF0000
+	ldr	r4, =((BA_EMRS1<<30)+(RDQS_DIS<<27)+(nDQS_DIS<<26)+(OCD_MODE_EXIT<<23)+(DLL_EN<<16))
+	ldr	r1, [r2]
+	bic	r1, r1, r3
+	orr	r1, r1, r4	@((BA_EMRS1<<30)+(RDQS_DIS<<27)+(nDQS_DIS<<26)+(OCD_MODE_DEFAULT<<23)+(DLL_EN<<16))
+	str	r1, [r2]
+
+	ldr	r2, =BANKCON1REG
+	ldr	r1, [r2]
+	bic	r1, r1, #(0x3<<0)
+	orr	r1, r1, #(0x3<<0)
+	str	r1, [r2]
+
+	ldr	r4, =REFRESHREG
+	ldr	r0, =REFCYC
+	str	r0, [r4]
+
+	ldr	r2, =BANKCON1REG
+	ldr	r1, [r2]
+	bic	r1, r1, #(0x3<<0)
+	str	r1, [r2]
+
+#   OPEN LED1
+	ldr r0, =GPBCON
+	mov r1, #0x0
+    ldr r1, =(1<<6)|(1<<18) @configure GPB3 and GPB9 output mode
+	str r1, [r0]
+
+	ldr r0, =GPBUDP
 	ldr r1, [r0]
-	bic r1, r1, #0xffffffff
-	ldr r2, =(2 << 12)|(1 << 1)|(1 << 0)
-	orr r1, r1, r2
+	bic r1, r1, #(1 << 6)
+	orr r1, r1, #(1 << 7)  @configure GPB3's pullup
+	bic r1, r1, #(1 << 18)
+	orr r1, r1, #(1 << 19) @confgure GPB9's puiiup
+	str r1, [r0]
+
+	ldr r0, =GPBDAT
+	ldr r1, [r0]
+	bic r1, r1, #(1 << 3) @open led3
+	orr r1, r1, #(1 << 9) @don't open led9
 	str r1, [r0]
 
 	/* everything is fine now */

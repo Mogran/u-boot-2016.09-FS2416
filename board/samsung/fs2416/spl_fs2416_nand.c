@@ -46,6 +46,8 @@
 #define PAGE_SIZE 2048
 #define PAGE_NUMS 64
 
+extern void uart_tx_multiple_bytes(unsigned char *buf, int size);
+
 void nand_write_cmmd(unsigned char cmmd)
 {
 	NFCMMD = cmmd;
@@ -90,7 +92,27 @@ void nand_reset(void)
 	nand_wait_Rnb_ready();
 }
 
-static int nand_read_one_page(int addr, unsigned char *dat)
+
+void nand_read_id(void)
+{
+	unsigned char maf_id[5];
+	volatile unsigned char var = 0;
+
+	nand_write_cmmd(0x90);
+	nand_write_addr(0x00);
+	
+	for(var = 0; var < 5; var++){
+		maf_id[var] = nand_read_one_byte();
+	}
+	
+	nand_chip_disable();
+
+	uart_tx_multiple_bytes(maf_id, 5);
+
+}
+
+ 
+int nand_read_one_page(int addr, unsigned char *dat)
 {
 	int block_addr = 0;
 	int page_addr  = 0;
@@ -131,14 +153,16 @@ static int nand_read_one_page(int addr, unsigned char *dat)
  * */
 int copy_u_boot_to_dram(int uboot_start_addr, int dram_addr, int uboot_size)
 {
+#if 0	
 	int ofs = 0;
-	
 	if(uboot_start_addr%PAGE_SIZE || uboot_size%PAGE_SIZE){
 		/* fix me? if PAGE_SIZE != 2048 */
 		return 1;
 	}
 
 	nand_reset();
+	
+	nand_read_id();
 
 	for(ofs = uboot_start_addr; ofs < uboot_start_addr + uboot_size; ofs += PAGE_SIZE){
 		nand_read_one_page(ofs, (unsigned char*)dram_addr);
@@ -147,5 +171,38 @@ int copy_u_boot_to_dram(int uboot_start_addr, int dram_addr, int uboot_size)
 
 
 	return 0;
+#else
+
+	unsigned int memtst_addr = 0x30008000;
+	volatile unsigned int memtst_val  = 0x0;	
+	unsigned char mem_dbg[5];
+
+	/* write */
+	*(volatile unsigned int *)memtst_addr = 0xffeeddcc;
+
+	mem_dbg[0] = 0xff;
+	mem_dbg[1] = 0xee;
+	mem_dbg[2] = 0xdd;
+	mem_dbg[3] = 0xcc;
+
+	uart_tx_multiple_bytes(mem_dbg, 4);
+
+	/* read */
+	memtst_val = *(volatile unsigned int*)memtst_addr;	
+
+	mem_dbg[0] = memtst_val & 0xff;
+	mem_dbg[1] = (memtst_val >> 8) & 0xff;
+	mem_dbg[2] = (memtst_val >> 16)& 0xff;
+	mem_dbg[3] = (memtst_val >> 24)& 0xff;
+	
+	uart_tx_multiple_bytes(mem_dbg, 4);
+
+#endif	
+
+
+	if(memtst_val == 0xffeeddcc)
+		return 0;
+	else
+		return 1;
 }
 

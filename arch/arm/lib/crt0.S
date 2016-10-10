@@ -75,6 +75,8 @@ ENTRY(_main)
 #else
 	ldr	sp, =(CONFIG_SYS_INIT_SP_ADDR)
 #endif
+
+
 #if defined(CONFIG_CPU_V7M)	/* v7M forbids using SP as BIC destination */
 	mov	r3, sp
 	bic	r3, r3, #7
@@ -82,6 +84,8 @@ ENTRY(_main)
 #else
 	bic	sp, sp, #7	/* 8-byte alignment for ABI compliance */
 #endif
+
+
 	mov	r0, sp
 	bl	board_init_f_alloc_reserve
 	mov	sp, r0
@@ -93,32 +97,40 @@ ENTRY(_main)
 
 #if defined(CONFIG_SPL_BUILD) /* add by <mingliang.lu> */
 
+	bl uart_init
+
 	ldr r0, =CONFIG_SYS_NAND_U_BOOT_START	
 	ldr r1, =CONFIG_SYS_TEXT_BASE	
 	ldr r2, =CONFIG_SYS_NAND_U_BOOT_SIZE
 
 	bl copy_u_boot_to_dram
 
-	tst r0, #0
+	tst r0, #0x0
 	bne infinite_loop
 
-	ldr pc, =CONFIG_SYS_TEXT_BASE
+#if 0
+	mov r2, #0x10000 @wait until clock stablize all clock.
+1:  subs r2, r2, #1
+	bne 1b
+
+	ldr r1, =0x56000014
+	ldr r2, [r1]
+#	orr r2, r2, #(1 << 3)
+	bic r2, r2, #(1 << 9)
+	str r2, [r1]
+
+#	ldr pc, =CONFIG_SYS_TEXT_BASE
+#endif 
 
 infinite_loop:
-#define GPBCON 0x56000010
-#define GPBDAT 0x56000014
-#define GPBUDP 0x56000018
-
-	ldr r1, =GPBCON
+	ldr r1, =0x56000014 @0x56000014 this is GPBDAT register
 	ldr r2, [r1]
-	bic r2, r2, #(1 << 3)|(1 << 9)	
-
-	ldr r1, =GPBDAT
-	ldr r2, [r1]
-	bic r2, r2, #(1 << 3)|(1 << 9)	
-
+	orr r2, r2, #(1 << 3)
+	bic r2, r2, #(1 << 9)
+	str r2, [r1]
 0: 	
 	b 0b
+
 #else	
 
 	bl	board_init_f

@@ -115,8 +115,73 @@
 #define CONFIG_NR_DRAM_BANKS	2          /* we have 2 bank of DDR2 RAM */
 #define PHYS_SDRAM_1		0x30000000     /* SDRAM Bank #1 */
 #define PHYS_SDRAM_1_SIZE	0x04000000     /* 32 MB * 16 = 64Mb */
-#define PHYS_SDRAM_2		0x30000000     /* SDRAM Bank #2 */
-#define PHYS_SDRAM_2_SIZE	0x04000000     /* 32 MB * 16 = 64Mb */
+#define PHYS_SDRAM_2		0x38000000     /* SDRAM Bank #2 */
+#define PHYS_SDRAM_2_SIZE	0x04000000     /* 32 MB * 16 = 64Mb */ 
+
+/*---------------------------------------
+ *BANKCONFIG register  : DDR2 SDRAM configure
+ */
+#define RASBW0							2			/*	RAS addr 00=11bit,01-12bit,10=13bit, 11=14bit */
+#define RASBW1							2			/*	RAS addr 00=11bit,01-12bit,10=13bit, 11=14bit */
+#define CASBW0							2			/*	CAS addr 00=8bit,01-9bit,10=10bit, 11=11bit */
+#define CASBW1							2			/*	CAS addr 00=8bit,01-9bit,10=10bit, 11=11bit */
+#define ADDRCFG0						1			/* 	addre configure 00={BA,RAS,CAS}, 01={RAS,BA,CAS} */
+#define ADDRCFG1						1			/* 	addre configure 00={BA,RAS,CAS}, 01={RAS,BA,CAS} */
+#define MEMCFG							1			/* 	Ext.Mem 000=SDR,010=MSDR,100=DDRz,110=MDDR,001=DDR2 */
+#define BW								1			/* 	Bus width 00=32bit,01=16bit */
+
+/*---------------------------------------
+ * BANKCON1 register : DDR2 SDRAM timing control
+ */
+#define PADLOAD							1
+#define BStop							0			//	read burst stop control
+#define WBUF							1			//	write buffer control
+#define AP								0			//	enable auto precharge control
+#define PWRDN							1			//	support power down mode
+#define DQSDelay						4			//	DQS delay
+
+/*---------------------------------------
+ * BANKCON2 register : DDR2 SDRAM timing control
+ */
+#define tRAS							5			//	Row active time
+#define tARFC							13			//	Row cycle time
+#define CL								3			//	CAS latency control
+#define tRCD							1			//	RAS to CAS delay
+#define tRP								1			// 	Row pre-charge time
+
+/*---------------------------------------
+ * BANKCON3 register : DDR2 SDRAM MRS/EMRS register
+ */
+#define BA_EMRS1						1			//	BA : EMRS
+#define DLL_DIS							1
+#define DLL_EN							0
+#define nDQS_DIS						1
+#define RDQS_DIS						0
+#define OCD_MODE_EXIT					0
+#define OCD_MODE_DEFAULT				7
+#define BA_EMRS2						2			//	BA : EMRS
+#define BA_EMRS3						3			//	BA : EMRS
+#define DS								0			//	Driver strength
+#define PASR							0			//	PASR
+#define BA_MRS							0			//	BA : MRS
+#define TM								0			// 	Test Mode - mode register set
+#define CL_MRS							3			// 	CAS Latency
+#define DLL_RESET_HIGH					1
+#define DLL_RESET_LOW					0
+
+/*---------------------------------------
+ * REFRESH register : DDR2 SDRAM refresh register
+ */
+#define REFCYC							1037			// 	refresh cycle
+
+/*---------------------------------------
+ *  Calc DDR2 DRAMC register
+ */
+#define BANKCFGVAL						((RASBW0<<17)+(RASBW1<<14)+(CASBW0<<11)+(CASBW1<<8)+(ADDRCFG0<<6)+(ADDRCFG1<<4)+(MEMCFG<<1)+(BW<<0))
+#define BANKCON1VAL						((DQSDelay<<28)+(1<<26)+(BStop<<7)+(WBUF<<6)+(AP<<5)+(PWRDN<<4))
+#define BANKCON2VAL						((tRAS<<20)+(tARFC<<16)+(CL<<4)+(tRCD<<2)+(tRP<<0))
+
+
 /*-----------------------------------------------------------------------
  * NAND-FLASH and environment organization
  */
@@ -159,8 +224,9 @@
 				GENERATED_GBL_DATA_SIZE)
 
 /* SPL relatived */
-#define CONFIG_SYS_TEXT_BASE         0x31000000
+#define CONFIG_SPL_STACK             0x2000
+#define CONFIG_SYS_TEXT_BASE         0x30008000
 #define CONFIG_SYS_NAND_U_BOOT_START  0x20000
-#define CONFIG_SYS_NAND_U_BOOT_SIZE   0x2000
+#define CONFIG_SYS_NAND_U_BOOT_SIZE   0x800
 
 #endif /* __CONFIG_H */
