@@ -27,3 +27,4 @@ u-boot-2016.09 to u-boot-2016.09-FS2416
 - version 1.0 
 	- add FS2416 DDR2 memory initialization where placed arm/board/samsung/fs2416/lowlevel_init.S
 	- add FS2416 board.c 
+	- fix FS2416 DDR2 bugs
