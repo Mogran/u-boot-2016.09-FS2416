@@ -240,6 +240,18 @@ lowlevel_init:
 	cmp r7, r5
 	bne 1002f		
 
+
+
+# Nand asm init
+	ldr r0, =NFCONF
+	ldr r2, =(0<<12)|(2<<8)|(1<<4)|(1<<1)
+	str r2, [r0]	
+
+	ldr r0, =NFCONT
+	ldr r2, =(2<<12)|(1<<1)|(1<<0)
+	str r2, [r0]	
+
+
 	/* everything is fine now */
 	mov	pc, lr
 
