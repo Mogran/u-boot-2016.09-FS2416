@@ -106,23 +106,11 @@ ENTRY(_main)
 	bl copy_u_boot_to_dram
 
 	tst r0, #0x0
-	bne infinite_loop
+	beq 1001f
 
-#if 0
-	mov r2, #0x10000 @wait until clock stablize all clock.
-1:  subs r2, r2, #1
-	bne 1b
+	ldr pc, =CONFIG_SYS_TEXT_BASE
 
-	ldr r1, =0x56000014
-	ldr r2, [r1]
-#	orr r2, r2, #(1 << 3)
-	bic r2, r2, #(1 << 9)
-	str r2, [r1]
-
-#	ldr pc, =CONFIG_SYS_TEXT_BASE
-#endif 
-
-infinite_loop:
+1001:
 	ldr r1, =0x56000014 @0x56000014 this is GPBDAT register
 	ldr r2, [r1]
 	orr r2, r2, #(1 << 3)
