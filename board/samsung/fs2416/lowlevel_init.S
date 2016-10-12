@@ -26,11 +26,11 @@
 #define GPBDAT   0x56000014
 #define GPBUDP   0x56000018
 
-#define BANKCFG0REG	0x48000000 
-#define BANKCON1REG	0x48000004 
-#define BANKCON2REG	0x48000008 
-#define BANKCON3REG	0x4800000C 
-#define REFRESHREG  0x48000010
+#define BANKCFG_REG		0x48000000 
+#define BANKCON1_REG	0x48000004 
+#define BANKCON2_REG	0x48000008 
+#define BANKCON3_REG	0x4800000C 
+#define REFRESH_REG  	0x48000010
 
 .globl lowlevel_init
 
@@ -84,145 +84,132 @@ lowlevel_init:
 	bne 1b
 
 #	DDR2 initialization
-
-	ldr r0, =BANKCFG0REG @BANKCFG
-	ldr r1, =(2<<17)+(2<<14)+(2<<11)+(2<<8)+(1<<1)+(1<<0)
+	
+	/* Step 1: BANKCFG Seting */
+	ldr r0, =BANKCFG_REG
+	ldr r1, =BANKCFG_VAL
+	str r1, [r0]
+	
+	ldr r0, =BANKCON1_REG
+	ldr r1, =BANKCON1_VAL
 	str r1, [r0]
 
-	ldr r0, =BANKCON1REG
-	ldr r1, =(3<<28)+(1<<26)+(1<<8)+(0<<7)+(1<<6)+(0<<5)+(1<<4)
+	/* Step 2: BANKCON2 Seting */
+	ldr r0, =BANKCON2_REG
+	ldr r1, =BANKCON2_VAL
 	str r1, [r0]
 
-	ldr r0, =BANKCON2REG
-	ldr r1, =(6<<20)+(14<<16)+(2<<4)+(2<<2)+(2<<0)
+	/* Step 3: issue PALL */
+	ldr r0, =BANKCON1_REG
+	ldr r1, [r0]
+	orr	r1, r1, #1
+	str	r1, [r0]
+
+	/* Step 4: issue a EMRS2 command */
+	ldr r2, =0x80000000
+	ldr r3, =BANKCON3_REG
+	str r2, [r3]
+
+	ldr r0, =BANKCON1_REG
+	ldr r1, [r0]
+	bic r1, r1, #3
+	orr	r1, r1, #3
+	str	r1, [r0]
+
+	/* Step 5: issue a EMRS3 command */
+	ldr r2, =0xC0000000
+	ldr r3, =BANKCON3_REG
+	str r2, [r3]
+
+	ldr r0, =BANKCON1_REG
+	ldr r1, [r0]
+	bic r1, r1, #3
+	orr	r1, r1, #3
+	str	r1, [r0]
+
+	/* Step 6: issue a EMRS1 command */
+	ldr r2, =0x44000000
+	ldr r3, =BANKCON3_REG
+	str r2, [r3]
+
+	ldr r0, =BANKCON1_REG
+	ldr r1, [r0]
+	bic r1, r1, #3
+	orr	r1, r1, #3
+	str	r1, [r0]
+
+	/* Step 7: issue a MRS command */
+	ldr r2, =0x44000130
+	ldr r3, =BANKCON3_REG
+	str r2, [r3]
+
+	ldr r0, =BANKCON1_REG
+	ldr r1, [r0]
+	bic r1, r1, #3
+	orr	r1, r1, #2
+	str	r1, [r0]
+
+	/* Step 8: issue PALL */
+	ldr r0, =BANKCON1_REG
+	ldr r1, [r0]
+	orr	r1, r1, #1
+	str	r1, [r0]
+
+	/* Step 9: write 0xff into the refresh timer */
+	ldr r0, =REFRESH_REG
+	mov r1, #0xff
 	str r1, [r0]
 
-	ldr	r2, =BANKCON1REG
-	ldr	r1, [r2]
-	bic	r1, r1, #(0x3<<0)
-	orr	r1, r1, #(0x1<<0)
-	str	r1, [r2]
+	/* Step 10: wait more than 120 clk */
+	mov r3, #0x100
+10 :
+	subs r3, r3, #1
+	bne 10b
 
-	ldr	r2, =BANKCON3REG
-	ldr	r3, =0xFFFF0000
-	ldr	r1, [r2]
-	bic	r1, r1, r3
-	orr	r1, r1, #(BA_EMRS2<<30)
-	str	r1, [r2]
+	/* Step 11: issue MRS */
+	ldr r2, =0x44000030
+	ldr r3, =BANKCON3_REG
+	str r2, [r3]
 
-	ldr	r2, =BANKCON1REG
-	ldr	r1, [r2]
-	bic	r1, r1, #(0x3<<0)
-	orr	r1, r1, #(0x3<<0)
-	str	r1, [r2]
+	ldr r0, =BANKCON1_REG
+	ldr r1, [r0]
+	bic r1, r1, #3
+	orr	r1, r1, #2
+	str	r1, [r0]
 
-	ldr	r2, =BANKCON3REG
-	ldr	r3, =0xFFFF0000
-	ldr	r1, [r2]
-	bic	r1, r1, r3
-	orr	r1, r1, #(BA_EMRS3<<30)
-	str	r1, [r2]
+	/* Step 12: issue a EMRS1 command */
+	ldr r2, =0x47800030
+	ldr r3, =BANKCON3_REG
+	str r2, [r3]
 
-	ldr	r2, =BANKCON1REG
-	ldr	r1, [r2]
-	bic	r1, r1, #(0x3<<0)
-	orr	r1, r1, #(0x3<<0)
-	str	r1, [r2]
+	ldr r0, =BANKCON1_REG
+	ldr r1, [r0]
+	bic r1, r1, #3
+	orr	r1, r1, #3
+	str	r1, [r0]
 
-	ldr	r2, =BANKCON3REG
-	ldr	r3, =0xFFFF0000
-	ldr	r4, =((BA_EMRS1<<30)+(RDQS_DIS<<27)+(nDQS_DIS<<26)+(OCD_MODE_EXIT<<23)+(DLL_EN<<16))
+	ldr r2, =0x44000030
+	ldr r3, =BANKCON3_REG
+	str r2, [r3]
 
-	ldr	r1, [r2]
-	bic	r1, r1, r3
-	orr	r1, r1, r4
-	str	r1, [r2]
+	ldr r0, =BANKCON1_REG
+	ldr r1, [r0]
+	bic r1, r1, #3
+	orr	r1, r1, #3
+	str	r1, [r0]
 
-	ldr	r2, =BANKCON1REG
-	ldr	r1, [r2]
-	bic	r1, r1, #(0x3<<0)
-	orr	r1, r1, #(0x3<<0)
-	str	r1, [r2]
+	/* Step 13: write 1037 into refresh timer */
+	ldr r0, =REFRESH_REG
+	ldr r1, =1037
+	str r1, [r0]
 
-	ldr	r2, =BANKCON3REG
-	ldr	r3, =0xFFFF
-	ldr	r1, [r2]
-	bic	r1, r1, r3
-	orr	r1, r1, #((BA_MRS<<14)+(DLL_RESET_HIGH<<8)+(TM<<7)+(CL_MRS<<4))
-	str	r1, [r2]
+	/* Step 14: write back Normal mode */
+	ldr r0, =BANKCON1_REG
+	ldr r1, [r0]
+	bic r1, r1, #3
+	str	r1, [r0]
 
-	ldr	r2, =BANKCON1REG
-	ldr	r1, [r2]
-	bic	r1, r1, #(0x3<<0)
-	orr	r1, r1, #(0x2<<0)
-	str	r1, [r2]
-
-	ldr	r2, =BANKCON1REG
-	ldr	r1, [r2]
-	bic	r1, r1, #(0x3<<0)
-	orr	r1, r1, #(0x1<<0)
-	str	r1, [r2]
-
-	ldr	r4, =REFRESHREG
-	ldr	r0, =0x20
-	str	r0, [r4]
-
-	ldr	r2, =BANKCON3REG
-	ldr	r3, =0xFFFF
-	ldr	r1, [r2]
-	bic	r1, r1, r3
-	orr	r1, r1, #((BA_MRS<<14)+(DLL_RESET_LOW<<8)+(TM<<7)+(CL_MRS<<4))
-	str	r1, [r2]
-
-	ldr	r2, =BANKCON1REG
-	ldr	r1, [r2]
-	bic	r1, r1, #(0x3<<0)
-	orr	r1, r1, #(0x2<<0)
-	str	r1, [r2]
-
-	mov	r0, #0x100
-2:
-	subs	r0, r0, #1
-	bne	2b
-
-	ldr	r2, =BANKCON3REG
-	ldr	r3, =0xFFFF0000
-	ldr	r4, =((BA_EMRS1<<30)+(RDQS_DIS<<27)+(nDQS_DIS<<26)+(OCD_MODE_DEFAULT<<23)+(DLL_EN<<16))
-	ldr	r1, [r2]
-	bic	r1, r1, r3
-	orr	r1, r1, r4	@((BA_EMRS1<<30)+(RDQS_DIS<<27)+(nDQS_DIS<<26)+(OCD_MODE_DEFAULT<<23)+(DLL_EN<<16))
-	str	r1, [r2]
-
-	ldr	r2, =BANKCON1REG
-	ldr	r1, [r2]
-	bic	r1, r1, #(0x3<<0)
-	orr	r1, r1, #(0x3<<0)
-	str	r1, [r2]
-
-	ldr	r2, =BANKCON3REG
-	ldr	r3, =0xFFFF0000
-	ldr	r4, =((BA_EMRS1<<30)+(RDQS_DIS<<27)+(nDQS_DIS<<26)+(OCD_MODE_EXIT<<23)+(DLL_EN<<16))
-	ldr	r1, [r2]
-	bic	r1, r1, r3
-	orr	r1, r1, r4	@((BA_EMRS1<<30)+(RDQS_DIS<<27)+(nDQS_DIS<<26)+(OCD_MODE_DEFAULT<<23)+(DLL_EN<<16))
-	str	r1, [r2]
-
-	ldr	r2, =BANKCON1REG
-	ldr	r1, [r2]
-	bic	r1, r1, #(0x3<<0)
-	orr	r1, r1, #(0x3<<0)
-	str	r1, [r2]
-
-	ldr	r4, =REFRESHREG
-	ldr	r0, =REFCYC
-	str	r0, [r4]
-
-	ldr	r2, =BANKCON1REG
-	ldr	r1, [r2]
-	bic	r1, r1, #(0x3<<0)
-	str	r1, [r2]
-
-#   OPEN LED1
+# OPEN LED1
 	ldr r0, =GPBCON
 	mov r1, #0x0
     ldr r1, =(1<<6)|(1<<18) @configure GPB3 and GPB9 output mode
@@ -242,7 +229,21 @@ lowlevel_init:
 	orr r1, r1, #(1 << 9) @don't open led9
 	str r1, [r0]
 
+# DDR2 init test, if init success,return back or jump into infinte loop	
+	ldr r6, =(PHYS_SDRAM_1+0x4)
+	ldr r7, =0x24564236 @write a randam integer
+	swp r8, r7, [r6]
+	swp r5, r8, [r6]
+	cmp r7, r5
+	bne 1002f		
+
 	/* everything is fine now */
 	mov	pc, lr
 
-
+1002:
+	ldr r1, =0x56000014 @0x56000014 this is GPBDAT register
+	ldr r2, [r1]
+	bic r2, r2, #(1 << 9)
+	str r2, [r1]
+0: 	
+	b 0b
