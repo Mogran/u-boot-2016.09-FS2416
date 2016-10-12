@@ -1,5 +1,5 @@
 /*
- * @description : FS2416 memory configuration
+ * @description : FS2416 memory configuration file
  * @author      : <lumingliang.github@gmail.com>
  * @date        : 2016-10-09
  * @other:
@@ -168,6 +168,7 @@ lowlevel_init:
 	subs r3, r3, #1
 	bne 10b
 
+	/* The next steps will excute OCD Calibration*/
 	/* Step 11: issue MRS */
 	ldr r2, =0x44000030
 	ldr r3, =BANKCON3_REG
