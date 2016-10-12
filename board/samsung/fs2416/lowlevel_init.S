@@ -1,9 +1,11 @@
 /*
- * FS2416 memory configuration
- * 
- * 0.配置系统时钟，使能各模块单元时钟，为初始化ddr2内存做准备
- * 1.初始化ddr2内存，初始化nandflash
- * 2.为接下来的拷贝u-boot到内存中做准备
+ * @description : FS2416 memory configuration
+ * @author      : <lumingliang.github@gmail.com>
+ * @date        : 2016-10-09
+ * @other:
+ * 		0.配置系统时钟，使能各模块单元时钟，为初始化ddr2内存做准备
+ * 		1.初始化ddr2内存，初始化nandflash
+ * 		2.为接下来的拷贝u-boot到内存中做准备
  */
 #include <config.h>
 
