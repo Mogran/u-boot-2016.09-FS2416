@@ -113,8 +113,8 @@ ENTRY(_main)
 1001:
 	ldr r1, =0x56000014 @0x56000014 this is GPBDAT register
 	ldr r2, [r1]
-	orr r2, r2, #(1 << 3)
-	bic r2, r2, #(1 << 9)
+	orr r2, r2, #(1 << 3)	@close LED1(GPB3)
+	bic r2, r2, #(1 << 9)	@open  LED2(GPB9)  
 	str r2, [r1]
 0: 	
 	b 0b
