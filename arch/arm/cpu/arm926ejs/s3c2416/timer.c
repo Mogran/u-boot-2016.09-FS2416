@@ -27,17 +27,26 @@ int timer_init(void)
 	ulong tmr;
 
 	/* use PWM Timer 4 because it has no output */
-	/* prescaler for Timer 4 is 16 */
-	writel(0x0f00, &timers->tcfg0);
+	/* prescaler for Timer 4 is 1 */
+	writel(0x0011, &timers->tcfg0);
+	/* divider for Timer 4 is 16 */
+	writel(0x0300, &timers->tcfg1);
+
+#if 0	
 	if (gd->arch.tbu == 0) {
 		/*
-		 * for 10 ms clock period @ PCLK with 4 bit divider = 1/2
+		 * for 10 ms clock period @ PCLK with 8 bit divider = 1/2
 		 * (default) and prescaler = 16. Should be 10390
 		 * @33.25MHz and 15625 @ 50 MHz
 		 */
 		gd->arch.tbu = get_PCLK() / (2 * 16 * 100);
 		gd->arch.timer_rate_hz = get_PCLK() / (2 * 16);
 	}
+#endif	
+
+	gd->arch.tbu = get_PCLK() / (2 * 16 * 100);
+	gd->arch.timer_rate_hz = get_PCLK() / (2 * 16);
+
 	/* load value for 10 ms timeout */
 	writel(gd->arch.tbu, &timers->tcntb4);
 	/* auto load, manual update of timer 4 */
