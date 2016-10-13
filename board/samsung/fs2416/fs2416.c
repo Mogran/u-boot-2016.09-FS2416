@@ -53,6 +53,7 @@ static inline void pll_delay(unsigned long loops)
 
 int board_early_init_f(void)
 {
+#if 0
 	struct s3c24x0_clock_power * const clk_power =
 					s3c24x0_get_base_clock_power();
 	struct s3c24x0_gpio * const gpio = s3c24x0_get_base_gpio();
@@ -90,6 +91,7 @@ int board_early_init_f(void)
 	writel(0x0000FFFF, &gpio->gpgup);
 	writel(0x002AFAAA, &gpio->gphcon);
 	writel(0x000007FF, &gpio->gphup);
+#endif
 
 	return 0;
 }

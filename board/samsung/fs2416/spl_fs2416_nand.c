@@ -112,11 +112,12 @@ void nand_read_id(void)
 }
 
  
-int nand_read_one_page(int addr, unsigned char *dat)
+int nand_read_one_page(int addr, int ram_addr)
 {
 	int block_addr = 0;
 	int page_addr  = 0;
 	int i = 0;
+	unsigned char* dst_addr = (unsigned char*)ram_addr;
 
 	block_addr = addr/(PAGE_SIZE*PAGE_NUMS);
 	page_addr  = (addr%(PAGE_SIZE*PAGE_NUMS))/(PAGE_SIZE);
@@ -128,7 +129,7 @@ int nand_read_one_page(int addr, unsigned char *dat)
 
 	nand_write_addr(0x00);
 	nand_write_addr(0x00);
-	nand_write_addr(((block_addr&0x3) << 6) | (page_addr & 0x40));
+	nand_write_addr(((block_addr&0x3) << 6) | (page_addr & 0xff));
 	nand_write_addr((block_addr >> 2)&0xff);
 	nand_write_addr((block_addr >> 10)&0x03);
 	nand_write_cmmd(0x30);
@@ -136,7 +137,7 @@ int nand_read_one_page(int addr, unsigned char *dat)
 	nand_wait_Rnb_ready();
 
 	for(i = 0; i < PAGE_SIZE; i++){
-		*dat++ = nand_read_one_byte();	
+		*dst_addr++ = nand_read_one_byte();	
 	}
 
 	nand_chip_disable();
@@ -151,11 +152,13 @@ int nand_read_one_page(int addr, unsigned char *dat)
  *				1.传入的u-boot存放的地址要是nandflash的页边界对齐
  *				2.传入的u-boot的实际大小也要求是nandflash的页边界对齐
  * */
-int copy_u_boot_to_dram(int uboot_start_addr, int dram_addr, int uboot_size)
+int copy_u_boot_to_dram(int uboot_start_addr, int ram_addr, int u_boot_size)
 {
-#if 0	
-	int ofs = 0;
-	if(uboot_start_addr%PAGE_SIZE || uboot_size%PAGE_SIZE){
+#if 1	
+	volatile int ofs = 0;
+	volatile unsigned int dram_addr = ram_addr;
+
+	if(uboot_start_addr%PAGE_SIZE || u_boot_size%PAGE_SIZE){
 		/* fix me? if PAGE_SIZE != 2048 */
 		return 1;
 	}
@@ -164,11 +167,10 @@ int copy_u_boot_to_dram(int uboot_start_addr, int dram_addr, int uboot_size)
 	
 	nand_read_id();
 
-	for(ofs = uboot_start_addr; ofs < uboot_start_addr + uboot_size; ofs += PAGE_SIZE){
-		nand_read_one_page(ofs, (unsigned char*)dram_addr);
+	for(ofs = uboot_start_addr; ofs < uboot_start_addr + u_boot_size; ofs += PAGE_SIZE){
+		nand_read_one_page(ofs, dram_addr);
 		dram_addr += PAGE_SIZE;
 	}
-
 
 	return 0;
 #else
@@ -197,12 +199,13 @@ int copy_u_boot_to_dram(int uboot_start_addr, int dram_addr, int uboot_size)
 	
 	uart_tx_multiple_bytes(mem_dbg, 4);
 
-#endif	
-
 
 	if(memtst_val == 0xffeeddcc)
 		return 0;
 	else
 		return 1;
+
+#endif 
+
 }
 

@@ -14,8 +14,8 @@
 #define S3C2410_NFCONF_EN          (1<<15)
 #define S3C2410_NFCONF_512BYTE     (1<<14)
 #define S3C2410_NFCONF_4STEP       (1<<13)
-#define S3C2410_NFCONF_INITECC     (1<<12)
-#define S3C2410_NFCONF_nFCE        (1<<11)
+#define S3C2410_NFCONF_INITECC     (1<<5)
+#define S3C2410_NFCONF_nFCE        (1<<1)
 #define S3C2410_NFCONF_TACLS(x)    ((x)<<8)
 #define S3C2410_NFCONF_TWRPH0(x)   ((x)<<4)
 #define S3C2410_NFCONF_TWRPH1(x)   ((x)<<0)
@@ -70,6 +70,7 @@ static void s3c24x0_hwcontrol(struct mtd_info *mtd, int cmd, unsigned int ctrl)
 static int s3c24x0_dev_ready(struct mtd_info *mtd)
 {
 	struct s3c24x0_nand *nand = s3c24x0_get_base_nand();
+
 	debug("dev_ready\n");
 	return readl(&nand->nfstat) & 0x01;
 }
@@ -110,31 +111,9 @@ static int s3c24x0_nand_correct_data(struct mtd_info *mtd, u_char *dat,
 
 int board_nand_init(struct nand_chip *nand)
 {
-	u_int32_t cfg;
-	u_int8_t tacls, twrph0, twrph1;
-	struct s3c24x0_clock_power *clk_power = s3c24x0_get_base_clock_power();
 	struct s3c24x0_nand *nand_reg = s3c24x0_get_base_nand();
 
 	debug("board_nand_init()\n");
-
-	writel(readl(&clk_power->clkcon) | (1 << 4), &clk_power->clkcon);
-
-	/* initialize hardware */
-#if defined(CONFIG_S3C24XX_CUSTOM_NAND_TIMING)
-	tacls  = CONFIG_S3C24XX_TACLS;
-	twrph0 = CONFIG_S3C24XX_TWRPH0;
-	twrph1 =  CONFIG_S3C24XX_TWRPH1;
-#else
-	tacls = 4;
-	twrph0 = 8;
-	twrph1 = 8;
-#endif
-
-	cfg = S3C2410_NFCONF_EN;
-	cfg |= S3C2410_NFCONF_TACLS(tacls - 1);
-	cfg |= S3C2410_NFCONF_TWRPH0(twrph0 - 1);
-	cfg |= S3C2410_NFCONF_TWRPH1(twrph1 - 1);
-	writel(cfg, &nand_reg->nfconf);
 
 	/* initialize nand_chip data structure */
 	nand->IO_ADDR_R = (void *)&nand_reg->nfdata;

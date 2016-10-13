@@ -49,6 +49,15 @@ reset:
 #endif
 #endif 
 
+
+#if !defined(CONFIG_SPL_BUILD)
+	ldr r0, =0x56000014
+	ldr r1, [r0]
+	bic r1, r1, #(1<<3)
+	bic r1, r1, #(1<<9)
+	str r1, [r0]
+#endif	
+
 	bl	_main
 
 /*------------------------------------------------------------------------------*/

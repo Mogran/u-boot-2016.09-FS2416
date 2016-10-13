@@ -840,9 +840,6 @@ __weak int arch_cpu_init_dm(void)
 }
 
 static init_fnc_t init_sequence_f[] = {
-#ifdef CONFIG_SANDBOX
-	setup_ram_buf,
-#endif
 	setup_mon_len,
 #ifdef CONFIG_OF_CONTROL
 	fdtdec_setup,
@@ -852,13 +849,6 @@ static init_fnc_t init_sequence_f[] = {
 #endif
 	initf_malloc,
 	initf_console_record,
-#if defined(CONFIG_MPC85xx) || defined(CONFIG_MPC86xx)
-	/* TODO: can this go into arch_cpu_init()? */
-	probecpu,
-#endif
-#if defined(CONFIG_X86) && defined(CONFIG_HAVE_FSP)
-	x86_fsp_init,
-#endif
 	arch_cpu_init,		/* basic arch cpu dependent setup */
 	initf_dm,
 	arch_cpu_init_dm,
@@ -867,15 +857,6 @@ static init_fnc_t init_sequence_f[] = {
 	board_early_init_f,
 #endif
 	/* TODO: can any of this go into arch_cpu_init()? */
-#if defined(CONFIG_PPC) && !defined(CONFIG_8xx_CPUCLK_DEFAULT)
-	get_clocks,		/* get CPU and bus clocks (etc.) */
-#if defined(CONFIG_TQM8xxL) && !defined(CONFIG_TQM866M) \
-		&& !defined(CONFIG_TQM885D)
-	adjust_sdram_tbs_8xx,
-#endif
-	/* TODO: can we rename this to timer_init()? */
-	init_timebase,
-#endif
 #if defined(CONFIG_ARM) || defined(CONFIG_MIPS) || \
 		defined(CONFIG_BLACKFIN) || defined(CONFIG_NDS32) || \
 		defined(CONFIG_SPARC)

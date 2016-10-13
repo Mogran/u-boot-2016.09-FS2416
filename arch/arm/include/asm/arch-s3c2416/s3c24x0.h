@@ -99,14 +99,18 @@ struct s3c24x0_dmas {
 /*                          (see S3C2410 manual chapter 7) */
 struct s3c24x0_clock_power {
 	u32	locktime;
+	u32 lockcon0;
+	u32 oscset;
 	u32	mpllcon;
 	u32	upllcon;
-	u32	clkcon;
-	u32	clkslow;
-	u32	clkdivn;
-#if defined(CONFIG_S3C2440)
-	u32	camdivn;
-#endif
+	u32 epllcon_k;
+	u32	clkcon;	 /*clksrc*/
+	u32	clkslow; /*clkdiv0*/
+	u32	clkdivn; /*clkdiv1*/
+	u32 clkdiv2;
+	u32 hclkcon;
+	u32 pclkcon;
+	u32 sclkcon;
 };
 
 
@@ -138,29 +142,31 @@ struct s3c24x0_lcd {
 /* NAND FLASH (see manual chapter 6) */
 struct s3c24x0_nand {
 	u32	nfconf;
-#ifndef CONFIG_S3C2410
 	u32	nfcont;
-#endif
-	u32	nfcmd;
+	u32	nfcmmd;
 	u32	nfaddr;
 	u32	nfdata;
-#ifndef CONFIG_S3C2410
-	u32	nfeccd0;
-	u32	nfeccd1;
-	u32	nfeccd;
-#endif
+	u32	nfmeccd0;
+	u32	nfmeccd1;
+	u32	nfseccd;
+	u32 nfsblk;
+	u32 nfeblk;
 	u32	nfstat;
-#ifdef CONFIG_S3C2410
-	u32	nfecc;
-#else
-	u32	nfstat0;
-	u32	nfstat1;
-	u32	nfmecc0;
-	u32	nfmecc1;
-	u32	nfsecc;
-	u32	nfsblk;
-	u32	nfeblk;
-#endif
+	u32 nfeccerr0;
+	u32 nfeccerr1;
+	u32 nfmecc0;
+	u32 nfmecc1;
+	u32 nfsecc;
+	u32 nfmlcbitpt;
+	u32 nf8eccerr0;
+	u32 nf8eccerr1;
+	u32 nf8eccerr2;
+	u32 nfm8ecc0;
+	u32 nfm8ecc1;
+	u32 nfm8ecc2;
+	u32 nfm8ecc3;
+	u32 nfmlc8bitpt0;
+	u32 nfmlc8bitpt1;
 };
 
 /* UART (see manual chapter 11) */
