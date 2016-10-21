@@ -665,6 +665,9 @@ static void nand_command(struct mtd_info *mtd, unsigned int command,
 			       NAND_CMD_NONE, NAND_NCE | NAND_CTRL_CHANGE);
 		/* EZ-NAND can take upto 250ms as per ONFi v4.0 */
 		nand_wait_status_ready(mtd, 250);
+		while(!chip->dev_ready);
+
+		debug(" dev reset success !\n");
 		return;
 
 		/* This applies to read commands */
@@ -686,6 +689,7 @@ static void nand_command(struct mtd_info *mtd, unsigned int command,
 
 	nand_wait_ready(mtd);
 }
+
 
 /**
  * nand_command_lp - [DEFAULT] Send command to NAND large page device
@@ -718,21 +722,21 @@ static void nand_command_lp(struct mtd_info *mtd, unsigned int command,
 		/* Serially input address */
 		if (column != -1) {
 			/* Adjust columns for 16 bit buswidth */
-			if (chip->options & NAND_BUSWIDTH_16 &&
-					!nand_opcode_8bits(command))
+			if (chip->options & NAND_BUSWIDTH_16 && !nand_opcode_8bits(command))
 				column >>= 1;
-			chip->cmd_ctrl(mtd, column, ctrl);
+
+			chip->cmd_ctrl(mtd, column&0xff, ctrl);
+#if 0			
 			ctrl &= ~NAND_CTRL_CHANGE;
 			chip->cmd_ctrl(mtd, column >> 8, ctrl);
+#endif			
 		}
 		if (page_addr != -1) {
 			chip->cmd_ctrl(mtd, page_addr, ctrl);
-			chip->cmd_ctrl(mtd, page_addr >> 8,
-				       NAND_NCE | NAND_ALE);
+			chip->cmd_ctrl(mtd, page_addr >> 8, NAND_NCE | NAND_ALE);
 			/* One more address cycle for devices > 128MiB */
 			if (chip->chipsize > (128 << 20))
-				chip->cmd_ctrl(mtd, page_addr >> 16,
-					       NAND_NCE | NAND_ALE);
+				chip->cmd_ctrl(mtd, page_addr >> 16,NAND_NCE | NAND_ALE);
 		}
 	}
 	chip->cmd_ctrl(mtd, NAND_CMD_NONE, NAND_NCE | NAND_CTRL_CHANGE);
@@ -753,6 +757,11 @@ static void nand_command_lp(struct mtd_info *mtd, unsigned int command,
 		return;
 
 	case NAND_CMD_RESET:
+		while(!chip->dev_ready);
+
+		debug(" dev reset success !\n");
+
+#if 0
 		if (chip->dev_ready)
 			break;
 		udelay(chip->chip_delay);
@@ -762,7 +771,12 @@ static void nand_command_lp(struct mtd_info *mtd, unsigned int command,
 			       NAND_NCE | NAND_CTRL_CHANGE);
 		/* EZ-NAND can take upto 250ms as per ONFi v4.0 */
 		nand_wait_status_ready(mtd, 250);
+#endif
 		return;
+
+	case NAND_CMD_READID:
+		/*	udelay(chip->chip_delay); */
+		return ;	
 
 	case NAND_CMD_RNDOUT:
 		/* No ready / busy check necessary */
@@ -3631,7 +3645,7 @@ static struct nand_flash_dev *nand_get_flash_type(struct mtd_info *mtd,
 	chip->cmdfunc(mtd, NAND_CMD_READID, 0x00, -1);
 
 	/* Read entire ID string */
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 5; i++)
 		id_data[i] = chip->read_byte(mtd);
 
 	if (id_data[0] != *maf_id || id_data[1] != *dev_id) {
@@ -3686,6 +3700,7 @@ static struct nand_flash_dev *nand_get_flash_type(struct mtd_info *mtd,
 	 */
 	if (*maf_id != NAND_MFR_SAMSUNG && !type->pagesize)
 		chip->options &= ~NAND_SAMSUNG_LP_OPTIONS;
+
 ident_done:
 
 	/* Try to identify manufacturer */

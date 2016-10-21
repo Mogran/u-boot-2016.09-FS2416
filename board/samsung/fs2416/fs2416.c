@@ -117,6 +117,27 @@ int dram_init(void)
 	return 0;
 }
 
+int dm9000_preinit(void)
+{
+	struct s3c24x0_smcctl* smcctl = s3c24x0_get_base_smcctl();
+#if 1
+	printf("smcctl-> smbonetyper addr = %x \n", &smcctl->smbonetyper);
+	printf("smcctl-> smcsr addr = %x \n", &smcctl->smcsr);
+	printf("smcctl-> smccr addr = %x \n", &smcctl->smccr);
+#else
+
+	/* 读最少4个时钟周期，写最少1个时钟周期*/
+	writel((4<<0), &smcctl->smcctl.smbidcyr);
+
+
+	writel((1<<21)|(1<<20)|(1<<13)|(1<<12)|(1 << 4), &smcctl->smcctl[4].smbcr);
+	writel(0x0, &smcctl->smcsr);
+	writel(0x03, &smcctl->smccr);
+#endif	
+	
+	return 0;
+}
+
 #ifdef CONFIG_CMD_NET
 int board_eth_init(bd_t *bis)
 {
@@ -124,6 +145,12 @@ int board_eth_init(bd_t *bis)
 #ifdef CONFIG_CS8900
 	rc = cs8900_initialize(0, CONFIG_CS8900_BASE);
 #endif
+
+#ifdef CONFIG_DM9000
+	dm9000_preinit();
+	rc = dm9000_initialize(bis);
+#endif
+
 	return rc;
 }
 #endif

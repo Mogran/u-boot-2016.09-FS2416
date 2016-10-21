@@ -37,6 +37,7 @@ enum s3c24x0_uarts_nr {
 #define S3C24X0_CLOCK_POWER_BASE	0x4C000000
 #define S3C24X0_LCD_BASE		    0x4C800000
 #define S3C2440_NAND_BASE		    0x4E000000
+#define S3C2416_SMCCTL_BASE			0x4F000000
 #define S3C24X0_UART_BASE		    0x50000000
 #define S3C24X0_TIMER_BASE		    0x51000000
 #define S3C24X0_USB_DEVICE_BASE		0x49800000
@@ -51,6 +52,11 @@ enum s3c24x0_uarts_nr {
 
 /* include common stuff */
 #include <asm/arch/s3c24x0.h>
+
+static inline struct s3c24x0_smcctl *s3c24x0_get_base_smcctl(void)
+{
+	return (struct s3c24x0_smcctl *)S3C2416_SMCCTL_BASE;
+}
 
 static inline struct s3c24x0_memctl *s3c24x0_get_base_memctl(void)
 {

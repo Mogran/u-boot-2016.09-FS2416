@@ -13,35 +13,15 @@
 
 #define S3C2410_NFCONF_nFCE        (1<<1)
 
-
-static void s3c2416_clear_Rnb(void)
-{
-	struct s3c24x0_nand *nand = s3c24x0_get_base_nand();
-
-	writel(readl(&nand->nfstat) | (1 << 4), &nand->nfstat);
-}
-
 static void s3c24x0_hwcontrol(struct mtd_info *mtd, int cmd, unsigned int ctrl)
 {
-	struct nand_chip *chip = mtd_to_nand(mtd);
 	struct s3c24x0_nand *nand = s3c24x0_get_base_nand();
 
+#if 0
+	debug("hwcontrol() cmd = %x ctrl = %x \n", cmd, ctrl);
+#endif
+
 	if (ctrl & NAND_CTRL_CHANGE) {
-
-		if ((ctrl & NAND_CLE)){
-			debug("hwcontrol(): write command : 0x%02x \n", cmd);
-			writeb(cmd, &nand->nfcmmd);
-			if(cmd == NAND_CMD_RESET || cmd == NAND_CMD_ERASE2 
-				|| cmd == NAND_CMD_READSTART || cmd == NAND_CMD_PAGEPROG)
-			{
-				s3c2416_clear_Rnb();
-			}
-		}
-		if ((ctrl & NAND_ALE)){
-			debug("hwcontrol(): write addr : 0x%02x \n", cmd);
-			writeb(cmd, &nand->nfaddr);
-		}
-
 		if (ctrl & NAND_NCE){
 			writel(readl(&nand->nfcont) & ~S3C2410_NFCONF_nFCE,
 			       &nand->nfcont);
@@ -52,18 +32,38 @@ static void s3c24x0_hwcontrol(struct mtd_info *mtd, int cmd, unsigned int ctrl)
 		}
 	}
 
-	if (cmd != NAND_CMD_NONE && cmd != 0x03)
+	if(cmd == NAND_CMD_NONE){
+		debug(" do nothing \n");
+		return;
+	}
+
+	switch(ctrl&0x0f){
+	case NAND_CTRL_CLE:
+		debug("hwcontrol(): write command : 0x%02x \n", cmd);
+		writeb(cmd, &nand->nfcmmd);
+	break;	
+	case NAND_CTRL_ALE:
+		debug("hwcontrol(): write addr : 0x%02x \n", cmd);
+		writeb(cmd, &nand->nfaddr);
+	break;
+	
+	default:
+#if 0	
 		writeb(cmd, chip->IO_ADDR_W);
+#else
+		debug("neither cmmd nor addr .. so, i don't do anything\n");	
+#endif		
+	break;	
+	
+	}
 }
 
 static int s3c24x0_dev_ready(struct mtd_info *mtd)
 {
 	struct s3c24x0_nand *nand = s3c24x0_get_base_nand();
 
-	/*while(!(readl(&nand->nfstat)&(1 << 4)));*/
-
 	/* debug("dev_ready\n");*/
-	return (readl(&nand->nfstat)&(1 << 4));
+	return (readl(&nand->nfstat)&(1 << 0));
 }
 
 int board_nand_init(struct nand_chip *nand)
@@ -73,7 +73,8 @@ int board_nand_init(struct nand_chip *nand)
 	debug("board_nand_init()\n");
 
 	/* initialize nand_chip data structure */
-	writel((0<<12)|(2<<8)|(1<<4)|(1<<1), &nand_reg->nfconf);
+	/*writel((0<<12)|(2<<8)|(1<<4)|(1<<1), &nand_reg->nfconf); */
+	writel((7<<12)|(7<<8)|(7<<4)|(1<<1), &nand_reg->nfconf); 
 	writel((0<<8)|(1<<1)|(1<<0), &nand_reg->nfcont);
 
 	nand->IO_ADDR_R = (void *)&nand_reg->nfdata;

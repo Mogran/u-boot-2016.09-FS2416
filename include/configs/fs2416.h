@@ -17,7 +17,7 @@
  * High Level Configuration Options
  * (easy to change)
  */
-#define DEBUG
+#undef DEBUG
 #define CONFIG_S3C24X0		/* This is a SAMSUNG S3C24x0-type SoC */
 #define CONFIG_S3C2416		/* specifically a SAMSUNG S3C2416 SoC */
 #define CONFIG_FS2416		/* on a SAMSUNG FS2416 Board */
@@ -32,13 +32,17 @@
 #define CONFIG_INITRD_TAG
 
 /*
- * Hardware drivers
+ * Hardware DM9000AE
  */
-#if 0
-#define CONFIG_CS8900		/* we have a CS8900 on-board */
-#define CONFIG_CS8900_BASE	0x19000300
-#define CONFIG_CS8900_BUS16	/* the Linux driver does accesses as shorts */
-#endif
+#define CONFIG_DM9000
+#define CONFIG_DRIVER_DM9000		/* we have a CS8900 on-board */
+#define CONFIG_DM9000_BASE  0x20000300
+#define DM9000_IO	CONFIG_DM9000_BASE
+#define DM9000_DATA  (0x20000300 + 8)
+
+#define CONFIG_DM9000_USE_16BIT	/* the Linux driver does accesses as shorts */
+#define CONFIG_DM9000_NO_SROM
+
 /*
  * select serial console configuration
  */
@@ -89,6 +93,7 @@
 #define CONFIG_NETMASK		255.255.255.0
 #define CONFIG_IPADDR		192.168.8.221
 #define CONFIG_SERVERIP		192.168.8.219
+#define CONFIG_ETHADDR      00:0D:58:99:56:F9
 
 #if defined(CONFIG_CMD_KGDB)
 #define CONFIG_KGDB_BAUDRATE	115200	/* speed to run kgdb serial port */
@@ -172,8 +177,10 @@
  */
 #define CONFIG_SYS_NO_FLASH 
 
+#if 0
 #define CONFIG_MTD_DEBUG
 #define CONFIG_MTD_DEBUG_VERBOSE	3
+#endif
 
 #define CONFIG_CMD_NAND
 #define CONFIG_NAND_FS2416
@@ -182,8 +189,8 @@
 #define CONFIG_SYS_NAND_BASE		0x08000000
 
 #define CONFIG_ENV_IS_IN_NAND
-#define CONFIG_ENV_OFFSET				0x0
-#define CONFIG_ENV_ADDR			(CONFIG_ENV_OFFSET + 0xa0000)
+#define CONFIG_ENV_OFFSET				0xC0000	
+#define CONFIG_ENV_ADDR			(CONFIG_ENV_OFFSET)
 #define CONFIG_ENV_SIZE					0x20000
 #define CONFIG_ENV_OVERWRITE
 

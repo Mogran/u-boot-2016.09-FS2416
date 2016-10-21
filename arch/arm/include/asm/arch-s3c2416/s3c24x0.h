@@ -25,6 +25,26 @@ struct s3c24x0_memctl {
 	u32	mrsrb7;
 };
 
+struct s3c2416_smcctl{
+	u32 smbidcyr;
+	u32 smbwstrdr;
+	u32 smbwstwrr;
+	u32 smbwstoenr;
+	u32 smbwstenr;
+	u32 smbcr;
+	u32 res1;
+	u32 res2;
+};
+
+struct s3c24x0_smcctl{
+	struct s3c2416_smcctl smcctl[6];
+	u32 res3[16];
+	u32 smbonetyper;
+	u32 res4[63];
+	u32 smcsr;
+	u32 smccr;
+};
+
 
 /* USB HOST (see manual chapter 12) */
 struct s3c24x0_usb_host {
