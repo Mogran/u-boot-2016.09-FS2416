@@ -35,14 +35,12 @@
  * Hardware DM9000AE
  */
 #define CONFIG_DM9000
-#define CONFIG_DRIVER_DM9000		/* we have a CS8900 on-board */
-#define CONFIG_DM9000_BASE  0x20000300
-#define DM9000_IO	CONFIG_DM9000_BASE
-#define DM9000_DATA  (0x20000300 + 8)
-
-#define CONFIG_DM9000_USE_16BIT	/* the Linux driver does accesses as shorts */
+#define CONFIG_DRIVER_DM9000		
+#define CONFIG_DM9000_BASE  	0x08000300
+#define DM9000_IO				CONFIG_DM9000_BASE
+#define DM9000_DATA  			(CONFIG_DM9000_BASE + 8)
+#define CONFIG_DM9000_USE_16BIT		/* the Linux driver does accesses as shorts */
 #define CONFIG_DM9000_NO_SROM
-
 /*
  * select serial console configuration
  */
@@ -75,7 +73,7 @@
 #define CONFIG_BOOTP_GATEWAY
 #define CONFIG_BOOTP_HOSTNAME
 
-#define CONFIG_BOOTCOMMAND              "tftpboot 30008000 uImage\;bootm 30008000"
+#define CONFIG_BOOTCOMMAND			"tftpboot 30008000 uImage\;bootm 30008000"
 #define CONFIG_BOOTARGS				""
 #define CONFIG_BOOTDELAY			5
 #define CONFIG_AUTO_COMPLETE		1
@@ -141,7 +139,7 @@
 #define MEMCFG							1			/* 	Ext.Mem 000=SDR,010=MSDR,100=DDRz,110=MDDR,001=DDR2 */
 #define BW								1			/* 	Bus width 00=32bit,01=16bit */
 
-#define BANKCFG_VAL						((RASBW0<<17)+(RASBW1<<14)+(CASBW0<<11)+(CASBW1<<8)+(ADDRCFG0<<6)+(ADDRCFG1<<4)+(MEMCFG<<1)+(BW<<0))
+#define BANKCFG_VAL			((RASBW0<<17)+(RASBW1<<14)+(CASBW0<<11)+(CASBW1<<8)+(ADDRCFG0<<6)+(ADDRCFG1<<4)+(MEMCFG<<1)+(BW<<0))
 /*---------------------------------------
  * BANKCON1 register : DDR2 SDRAM timing control
  */
@@ -151,7 +149,7 @@
 #define AP								0			//	enable auto precharge control
 #define PWRDN							1			//	support power down mode
 
-#define BANKCON1_VAL						((DQSDelay<<28)+(1<<26)+(BStop<<7)+(WBUF<<6)+(AP<<5)+(PWRDN<<4))
+#define BANKCON1_VAL		((DQSDelay<<28)+(1<<26)+(BStop<<7)+(WBUF<<6)+(AP<<5)+(PWRDN<<4))
 /*---------------------------------------
  * BANKCON2 register : DDR2 SDRAM timing control
  */
@@ -161,7 +159,7 @@
 #define tRCD							1			//	RAS to CAS delay
 #define tRP								1			// 	Row pre-charge time
 
-#define BANKCON2_VAL						((tRAS<<20)+(tARFC<<16)+(CL<<4)+(tRCD<<2)+(tRP<<0))
+#define BANKCON2_VAL		((tRAS<<20)+(tARFC<<16)+(CL<<4)+(tRCD<<2)+(tRP<<0))
 
 /*---------------------------------------
  * REFRESH register : DDR2 SDRAM refresh register
@@ -177,16 +175,11 @@
  */
 #define CONFIG_SYS_NO_FLASH 
 
-#if 0
-#define CONFIG_MTD_DEBUG
-#define CONFIG_MTD_DEBUG_VERBOSE	3
-#endif
-
 #define CONFIG_CMD_NAND
 #define CONFIG_NAND_FS2416
 #undef  CONFIG_SYS_S3C2410_NAND_HWECC
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
-#define CONFIG_SYS_NAND_BASE		0x08000000
+#define CONFIG_SYS_NAND_BASE		0x00000000
 
 #define CONFIG_ENV_IS_IN_NAND
 #define CONFIG_ENV_OFFSET				0xC0000	
@@ -223,7 +216,6 @@
 #define CONFIG_SPL_STACK             0x2000
 #define CONFIG_SYS_TEXT_BASE         0x30008000
 #define CONFIG_SYS_NAND_U_BOOT_START  0x20000
-/*#define CONFIG_SYS_NAND_U_BOOT_SIZE   0x800*/
 #define CONFIG_SYS_NAND_U_BOOT_SIZE   0x7d000
 
 #endif /* __CONFIG_H */
