@@ -120,20 +120,22 @@ int dram_init(void)
 int dm9000_preinit(void)
 {
 	struct s3c24x0_smcctl* smcctl = s3c24x0_get_base_smcctl();
-#if 1
-	printf("smcctl-> smbonetyper addr = %x \n", &smcctl->smbonetyper);
-	printf("smcctl-> smcsr addr = %x \n", &smcctl->smcsr);
-	printf("smcctl-> smccr addr = %x \n", &smcctl->smccr);
-#else
+	int smbcr4 = 0;
 
 	/* 读最少4个时钟周期，写最少1个时钟周期*/
-	writel((4<<0), &smcctl->smcctl.smbidcyr);
+	writel((2 << 0), &smcctl->smcctl[1].smbidcyr);
+	writel((2 << 0), &smcctl->smcctl[1].smbwstwrr);
+	writel((2 << 0), &smcctl->smcctl[1].smbwstrdr);
+	writel((1 << 0), &smcctl->smcctl[1].smbwstwenr);
+	writel((1 << 0), &smcctl->smcctl[1].smbwstoenr);
 
-
-	writel((1<<21)|(1<<20)|(1<<13)|(1<<12)|(1 << 4), &smcctl->smcctl[4].smbcr);
+	smbcr4 = readl(&smcctl->smcctl[4].smbcr);
+	/*printf("smbcr addr = %x, smbcr value = %x", &smcctl->smcctl[4].smbcr, smcctl->smcctl[4].smbcr);*/
+	smbcr4 &= ~(3 << 4);
+	
+	writel((1<<21)|(1<<20)|(0<<17)|(1 << 16)|(1<<13)|(1<<12)|(1 << 8)|(1 << 4)|(1<<0), &smcctl->smcctl[1].smbcr);
 	writel(0x0, &smcctl->smcsr);
 	writel(0x03, &smcctl->smccr);
-#endif	
 	
 	return 0;
 }
