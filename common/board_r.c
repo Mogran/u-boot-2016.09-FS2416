@@ -974,10 +974,6 @@ init_fnc_t init_sequence_r[] = {
 
 void board_init_r(gd_t *new_gd, ulong dest_addr)
 {
-#if 1
-	*(volatile unsigned int*)(0x56000014) &= ~(1 << 9);
-
-#endif
 
 #ifdef CONFIG_NEEDS_MANUAL_RELOC
 	int i;
