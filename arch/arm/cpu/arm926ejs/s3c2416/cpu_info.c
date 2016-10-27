@@ -19,6 +19,16 @@ static const getfreq freq_f[] = {
 
 static const char freq_c[] = { 'F', 'H', 'P' };
 
+void enable_caches(void)
+{
+#ifndef CONFIG_SYS_ICACHE_OFF
+	icache_enable();
+#endif	
+#ifndef CONFIG_SYS_DCACHE_OFF
+	dcache_enable();
+#endif	
+}
+
 int print_cpuinfo(void)
 {
 	int i;
@@ -35,3 +45,7 @@ int print_cpuinfo(void)
 
 	return 0;
 }
+
+
+
+
