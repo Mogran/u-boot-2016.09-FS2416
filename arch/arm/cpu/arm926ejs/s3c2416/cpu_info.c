@@ -19,11 +19,15 @@ static const getfreq freq_f[] = {
 
 static const char freq_c[] = { 'F', 'H', 'P' };
 
+
+/*
+ * 因为我们已经在start.S中关闭了D-Cache，所以，我们在此处
+ * 将根据我们自己的需要来决定是否要打开D-Cache，但需要注意的是
+ * 打开D-Cache就要同时启用MMU，因为D-Cache的使用需要借助MMU
+ * 来实现页表的映射。
+ * */
 void enable_caches(void)
 {
-#ifndef CONFIG_SYS_ICACHE_OFF
-	icache_enable();
-#endif	
 #ifndef CONFIG_SYS_DCACHE_OFF
 	dcache_enable();
 #endif	
